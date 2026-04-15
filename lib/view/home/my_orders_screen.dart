@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'order_model.dart';
+import 'order_details_screen.dart';
 
 class MyOrdersScreen extends StatelessWidget {
-  const MyOrdersScreen({super.key});
+  final List<BirthdayOrder> orders;
+
+  const MyOrdersScreen({super.key, required this.orders});
 
   @override
   Widget build(BuildContext context) {
@@ -12,10 +16,19 @@ class MyOrdersScreen extends StatelessWidget {
         title: const Text("הזמנות שלי"),
         centerTitle: true,
       ),
-      body: ListView.builder(
+      body: orders.isEmpty
+          ? const Center(
+        child: Text(
+          "אין הזמנות עדיין",
+          style: TextStyle(fontSize: 18),
+        ),
+      )
+          : ListView.builder(
         padding: const EdgeInsets.all(16),
-        itemCount: 3, // пример
+        itemCount: orders.length,
         itemBuilder: (context, index) {
+          final order = orders[index];
+
           return Card(
             margin: const EdgeInsets.only(bottom: 16),
             child: ListTile(
@@ -23,10 +36,21 @@ class MyOrdersScreen extends StatelessWidget {
                 backgroundColor: theme.colorScheme.primary.withOpacity(.2),
                 child: const Icon(Icons.event),
               ),
-              title: Text("הזמנה #${index + 1}"),
-              subtitle: const Text("תאריך: 12.04.2026\nסטטוס: הושלם"),
+              title: Text(order.packageName),
+              subtitle: Text(
+                "תאריך: ${order.date.day}.${order.date.month}.${order.date.year}\n"
+                    "סטטוס: ${order.status}",
+                textDirection: TextDirection.rtl,
+              ),
               trailing: const Icon(Icons.chevron_left),
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => OrderDetailsScreen(order: order),
+                  ),
+                );
+              },
             ),
           );
         },

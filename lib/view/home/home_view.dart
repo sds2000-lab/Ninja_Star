@@ -9,6 +9,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'profile_screen.dart';
 import 'my_orders_screen.dart';
 import 'my_coupons_screen.dart';
+import 'order_model.dart';
+import 'coupon_model.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -20,24 +22,37 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   int _index = 0;
 
-  final screens = [
-    _HomeScrollContent(),
-    ProfileScreen(),
-    MyOrdersScreen(),
-    MyCouponsScreen(),
-  ];
+  // Храним заказы и купоны здесь
+  final List<BirthdayOrder> userOrders = [];
+  final List<CouponModel> userCoupons = [];
 
   @override
   Widget build(BuildContext context) {
+    // ВАЖНО: создаём screens внутри build()
+    final screens = [
+      _HomeScrollContent(),
+
+      ProfileScreen(
+        userName: "משתמש", // или null если не авторизован
+        userOrders: userOrders,
+        userCoupons: userCoupons,
+      ),
+
+      MyOrdersScreen(orders: userOrders),
+
+      MyCouponsScreen(coupons: userCoupons),
+    ];
+
     return Scaffold(
       body: screens[_index],
       bottomNavigationBar: _BottomBar(
         selectedIndex: _index,
-        onTap: (i) => setState(() => _index = i),   // ← ЭТО ГЛАВНОЕ
+        onTap: (i) => setState(() => _index = i),
       ),
     );
   }
 }
+
 // ─────────────────────────────────────────────────────────────
 //   BOTTOM BAR
 // ─────────────────────────────────────────────────────────────
@@ -206,16 +221,14 @@ class _HeroBannerState extends State<_HeroBanner> {
 
   // Названия баннеров
   final _banners = const [
-    "Crazy Room",
-    "White Pool",
-    "Karaoke Room",
-    "Bowling",
+    "Crazy Room - סניף אשדוד",
+    "Karaoke Room - סניף רחובות",
+    "Bowling - סניף רחובות",
   ];
 
   // Картинки для каждого баннера
   final _images = const [
     "asset/image/crazy_room.jpg",
-    "asset/image/white_pool.jpg",
     "asset/image/karaoke.jpg",
     "asset/image/bowling.jpg",
   ];
